@@ -1,108 +1,86 @@
-# 1. vuex是什么
-	github站点: https://github.com/vuejs/vuex
-	在线文档: https://vuex.vuejs.org/zh-cn/
-	简单来说: 对应用中组件的状态进行集中式的管理(读/写)
+# 项目相关问题
+## 1. 问题1:
+      Cannot read property '0' of undefined"
+      Cannot read property 'avatar' of null"
+    原因: 初始化数据对象为{}, 模板中使用了3层的表达式
+    解决: 使用v-if, 只有真正有数据进才显示
 
-# 2. 状态自管理应用
-	state: 驱动应用的数据源
-	view: 以声明方式将state映射到视图
-	actions: 响应在view上的用户输入导致的状态变化(包含n个更新状态的方法)
-![单向数据流](https://vuex.vuejs.org/zh-cn/images/flow.png)
+## 2. Cannot read property '$refs' of undefined
+    原因: 非组件的回调函数中的this不是组件对象
+    解决: 使用箭头函数定义回调函数
 
-# 3. 多组件共享状态的问题
-	多个视图依赖于同一状态
-	来自不同视图的行为需要变更同一状态
-	以前的解决办法
-		* 将数据以及操作数据的行为都定义在父组件
-		* 将数据以及操作数据的行为传递给需要的各个子组件(有可能需要多级传递)
-	vuex就是用来解决这个问题的
-![vuex结构](https://vuex.vuejs.org/zh-cn/images/vuex.png)
+## 3. 状态对象中的属性数据更新了, 但界面不更新
+    原因: 新添加的属性没有数据绑定, 即使数据变化了, 也不可能更新界面
+    解决: Vue.set(obj, key, value) // 这样key就是响应式的
 
-# 4. vuex的核心概念
-## 1). state
-	vuex管理的状态对象
-	它应该是唯一的
-	const state = {
-		xxx: initValue
-	}
-## 2). mutations
-	包含多个直接更新state的方法(回调函数)的对象
-	谁来触发: action中的commit('mutation名称')
-	只能包含同步的代码, 不能写异步代码
-	const mutations = {
-		yyy (state, data) { 
-			// 更新state的某个属性
-		}
-	}
-## 3). actions
-	包含多个事件回调函数的对象
-	通过执行: commit()来触发mutation的调用, 间接更新state
-	谁来触发: 组件中: $store.dispatch('action名称')  // 'zzz'
-	可以包含异步代码(定时器, ajax)
-	const actions = {
-		zzz ({commit, state}, data1) {
-			commit('yyy', data2)
-		}
-	}
-## 4). getters
-	包含多个计算属性(get)的对象
-	谁来读取: 组件中: $store.getters.xxx
-	const getters = {
-		mmm (state) {
-			return ...
-		}
-	}
-## 5). modules
-	包含多个module
-	一个module是一个store的配置对象
-	与一个组件(包含有共享数据)对应
+# 开始项目
+## 1. 项目开发准备
+    如何描述项目: 整体功能 / 功能模块 / 主体技术 / 开发模式
+    技术选型: 数据展现与交互 / 前后台交互 / 模块化 / 组件化 / 工程化 / css预编译器 / 滑动
+    接口相关概念: 接口 / 接口文档 / 对(调/测)接口 / 前后台分离 / mock数据(接口)
+    项目的编码测试与打包发布
 
-## 6). 向外暴露store对象
-	export default new Vuex.Store({
-		state,
-		mutations,
-		actions,
-		getters
-	})
+## 2. 搭建项目骨架
+    vue-cli
+    vue
+    webpack
+    es6
+    eslint
+    vue-router
+    stylus
 
-## 7). 组件中:
-	import {mapGetters, mapActions} from 'vuex'
-	export default {
-		computed: mapGetters(['mmm'])
-		methods: mapActions(['zzz'])
-	}
+## 3. mock数据(接口)
+    理解前后台分离
+    设计json数据
+        结构: 类型/名称
+        value
+    如何提供mock接口
+        express: 可以使用浏览器/postman测试, 但只能提供静态数据, 打包发布不能访问了
+        mockjs: 只能通过编码测试访问, 但可以提供动态随机数据, 打包发布还可以访问
+    编码ajax请求mock接口
+        vue-resource
+        axios
 
-	{{mmm}} @click="zzz(data)"
+##  header静态组件
+    使用stylus根据标注图编写移动端布局
+    图标字体
+    1px像素边框
+    stiky footer(粘连)布局
+    2x与3x图
+    flex布局
 
+##  使用vuex
+    store/index | state | mutations | actions | getters | types
+##  header动态组件
+    动态请求后台获取数据
+        api/index: 包含发送ajax请求的代码(不读取响应数据, 只是返回一个promise对象)
+        store/actions: 调用api发送ajax请求获取响应数据, 更新状态
+        在组件的mounted(): 通过this.$store.dispatch(actionName)触发action调用, ajax请求获取数据
+        在组件中: 利用mapState映射state中的seller数据成计算属性, 在模板中直接使用seller
+    过渡动画
 
-## 8). 映射store
-	import store from './store'
-	new Vue({
-		store
-	})
+##  stars组件
+    组件的作用
+        复用
+        简化
+    vue组件编写的流程
+        创建对应的文件夹和vue文件
+        分析并定义出组件的props/state
+        使用vue组件: 写标签, 并指定标签属性
+        vue文件的实现
+    在模板中需要的数据, 从哪取
+        data
+        props
+        computed
 
-## 9). store对象
-	1.所有用vuex管理的组件中都多了一个属性$store, 它就是一个store对象
-	2.属性:
-	  state: 注册的state对象
-	  getters: 注册的getters对象
-	3.方法:
-	  dispatch(actionName, data): 分发action 
+## goods组件
+    动态展现列表数据
+    基本滑动
+    点击左侧列表项, 右侧滑动到对应位置
+    滑动右侧列表, 左侧同步更新
 
-# 5. 将vuex引到项目中
-## 1). 下载: npm install vuex --save
-## 2). 使用vuex
-	1.store.js
-		import Vuex from 'vuex'
-		export default new Vuex.Store({
-			state,
-			mutations,
-			actions,
-			getters,
-			modules
-		})
-	2.main.js
-		import store from './store.js'
-		new Vue({
-			store
-		})
+## cartcontrol组件
+    动态添加商品组件，增加，减少
+
+## shopcart组件
+

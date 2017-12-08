@@ -9,12 +9,14 @@ import {
 const CODE_OK = 0
 
 export default {
-  getGoods({commit}){
+  getGoods({commit},callback){
     api.reqGoods().then(response =>{
       let result = response.data
       if(result.code === CODE_OK){
         const goods = result.data
         commit(RECEIVE_GOODS,{goods})
+
+        callback && callback()
       }
     })
   },

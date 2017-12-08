@@ -19,20 +19,45 @@
       </div>
       <div class="ball-container"></div>
 
-      <div class="shopcart-list">
-        <div class="list-header">
-          <h1 class="title">购物车</h1>
-          <span class="empty">清空</span>
+      <transition name="fold">
+        <div class="shopcart-list" v-show="listShow">
+          <div class="list-header">
+            <h1 class="title">购物车</h1>
+            <span class="empty">清空</span>
+          </div>
+
+          <div class="list-content" ref="foods">
+            <ul>
+              <li class="food" v-for="(food,index) in cartFoods" :key="index">
+                <span class="name">{{food.name}}</span>
+                <div class="price">
+                  <span>￥{{food.price}}</span>
+                </div>
+                <div class="cartcontrol-wrapper">
+                  <cartcontrol :food="food"/>
+                </div>
+              </li>
+            </ul>
+          </div>
         </div>
-      </div>
+      </transition>
+
     </div>
-    <div class="list-mask" v-show="isShow" @click="toggleShow"></div>
+    <transition name="fade">
+      <div class="list-mask" v-show="isShow" @click="toggleShow"></div>
+    </transition>
+
   </div>
 </template>
 
 <script>
+  import BScroll from 'better-scroll'
   import {mapState,mapGetters} from 'vuex'
+  import cartcontrol from '../cartcontrol/cartcontrol.vue'
   export default {
+    components:{
+      cartcontrol
+    },
     data(){
       return {
         isShow:false
@@ -58,6 +83,25 @@
         }else{
           return '去结算'
         }
+      },
+
+      listShow(){
+        const {isShow,totalCount} = this
+
+        if(totalCount===0){
+          this.isShow = false
+          return false
+        }
+
+        if(isShow){
+          if(!scroll){
+            let scroll = new BScroll(this.$refs.foods,{
+              click:true
+            })
+          }
+        }
+
+        return isShow
       }
     }
   }

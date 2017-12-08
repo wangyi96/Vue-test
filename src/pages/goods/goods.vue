@@ -1,10 +1,10 @@
 <template>
   <div>
     <div class="goods">
-      <div class="menu-wrapper">
+      <div class="menu-wrapper" ref="menuWrapper">
         <ul>
-          <li class="menu-item" v-for="(good, index) in goods"
-              :key="index">
+          <li class="menu-item " v-for="(good, index) in goods"
+              :key="index" :class="{current:index===currentIndex}" @click="clickMenu(index)">
             <span class="text border-1px">
               <span class="icon" :class="supportsClasses[good.type]" v-if="good.type>=0"></span>
               {{good.name}}
@@ -47,9 +47,11 @@
 </template>
 
 <script>
+  import Vue from 'vue'
   import {mapState} from 'vuex'
   import cartcontrol from '../../components/cartcontrol/cartcontrol.vue'
   import shopcart from '../../components/shopcart/shopcart.vue'
+  import BScroll from 'better-scroll'
   export default {
     components:{
       cartcontrol,
@@ -57,16 +59,62 @@
     },
     data () {
       return {
-        supportsClasses: ['decrease', 'discount', 'guarantee', 'invoice', 'special']
+        supportsClasses: ['decrease', 'discount', 'guarantee', 'invoice', 'special'],
+        scrollY:0,
+        taps:[]
       }
     },
     mounted(){
-      this.$store.dispatch('getGoods')
+      this.$store.dispatch('getGoods',()=>{
+        this.$nextTick(()=>{
+          this._initScroll()
+          this.taps = this._initTops()
+        })
+      })
     },
     computed: {
       ...mapState(['goods']),
       currentIndex(){
+        let {scrollY,taps} = this
+        let index = taps.findIndex((tap,index) =>{
+          return scrollY >= tap && scrollY < taps[index+1]
+        })
+        return index
+      }
+    },
+    methods:{
+      _initScroll(){
+        new BScroll(this.$refs.menuWrapper,{
+          click:true
+        })
+        this.foodsScroll =  new BScroll(this.$refs.foodsWrapper,{
+          probeType:2,
+          click:true
+        })
 
+        this.foodsScroll.on('scroll',(event)=>{
+          this.scrollY = Math.abs(event.y)
+        })
+        this.foodsScroll.on('scrollEnd',(event)=>{
+          this.scrollY = Math.abs(event.y)
+        })
+      },
+      _initTops(){
+        const taps=[]
+        let tap = 0
+        taps.push(tap)
+
+        let lis = this.$refs.foodsWrapper.getElementsByClassName('food-list-hook')
+        for (let i = 0; i < lis.length; i++) {
+          let li = lis[i]
+          tap +=li.clientHeight
+          taps.push(tap)
+        }
+        return taps
+      },
+      clickMenu(index){
+        this.scrollY = this.taps[index]
+        this.foodsScroll.scrollTo(0,-this.taps[index],500)
       }
     }
   }
