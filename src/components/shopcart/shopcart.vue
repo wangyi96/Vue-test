@@ -17,13 +17,25 @@
           </div>
         </div>
       </div>
-      <div class="ball-container"></div>
+
+      <div class="ball-container">
+        <transition v-for="(ball,index) in balls" :key="index"
+                    v-on:before-enter="beforeEnter"
+                    v-on:enter="enter"
+                    v-on:after-enter="afterEnter"
+                    :css="false">
+          <div class="ball" v-show="ball.isShow" >
+            <div class="inner inner-hook"></div>
+          </div>
+        </transition>
+      </div>
 
       <transition name="fold">
         <div class="shopcart-list" v-show="listShow">
           <div class="list-header">
             <h1 class="title">购物车</h1>
-            <span class="empty">清空</span>
+            <!--<span class="empty">清空</span>-->
+            <mt-button type="primary" style="float: right" @click="clear">清空</mt-button>
           </div>
 
           <div class="list-content" ref="foods">
@@ -51,22 +63,91 @@
 </template>
 
 <script>
+  import PubSub from 'pubsub-js'
   import BScroll from 'better-scroll'
   import {mapState,mapGetters} from 'vuex'
   import cartcontrol from '../cartcontrol/cartcontrol.vue'
+  import {MessageBox,Toast } from 'mint-ui'
+
   export default {
+    mounted(){
+      PubSub.subscribe('startEl',(message,startEl)=>{
+        const ball = this.balls.find( ball => !ball.isShow)
+
+        if(ball){
+          ball.isShow = true
+          ball.startEl = startEl
+          this.droppingBalls.push(ball)
+        }
+      })
+    },
     components:{
       cartcontrol
     },
     data(){
       return {
-        isShow:false
+        isShow:false,
+        balls:[
+          {isShow:false},
+          {isShow:false},
+          {isShow:false},
+          {isShow:false},
+          {isShow:false},
+          {isShow:false}
+        ],
+        droppingBalls:[]
       }
     },
     methods:{
+      clear(){
+        MessageBox.confirm('确定执行此操作?').then(action => {
+          this.$store.dispatch('clear',this.cartFoods)
+          Toast({
+            message: '清除成功',
+            position: 'middle',
+            duration: 1000
+          });
+
+        },(action) =>{});
+
+
+      },
       toggleShow(){
         this.isShow = !this.isShow
+      },
+      beforeEnter(el){
+        const ball = this.droppingBalls.shift()
+
+        const startEl = ball.startEl
+        const rect = startEl.getBoundingClientRect()
+        const startElLeft = rect.left
+        const startElTop = rect.top
+
+        const elLeft = 32
+        const elBottom = 22
+        const offsetTop = -(window.innerHeight - startElTop - elBottom)
+
+        el.children[0].style.transform = `translateX(${startElLeft - elLeft}px)`
+
+        el.style.transform = `translateY(${offsetTop}px)`
+
+        el.ball = ball
+      },
+      enter(el){
+
+        setTimeout(()=> {
+          el.style.transform = 'translateX(0)'
+
+          el.children[0].style.transform = 'translateY(0)'
+        },10)
+      },
+      afterEnter(el){
+        console.log(this.balls);
+        setTimeout(()=>{
+          el.ball.isShow = false
+        },400)
       }
+
     },
     computed:{
       ...mapState(['seller']),

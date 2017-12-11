@@ -12,12 +12,13 @@
           </li>
         </ul>
       </div>
+      <keep-alive></keep-alive>
       <div class="foods-wrapper" ref="foodsWrapper">
         <ul>
           <li class="food-list food-list-hook" v-for="(good, index) in goods" :key="index">
             <h1 class="title">{{good.name}}</h1>
             <ul>
-              <li class="food-item border-1px" v-for="(food, index) in good.foods">
+              <li class="food-item border-1px" v-for="(food, index) in good.foods" @click="ShowFood(food)">
                 <div class="icon">
                   <img width="57" height="57" :src="food.icon">
                 </div>
@@ -43,6 +44,8 @@
       </div>
       <shopcart />
     </div>
+
+    <food :food="food" ref="food"/>
   </div>
 </template>
 
@@ -51,17 +54,21 @@
   import {mapState} from 'vuex'
   import cartcontrol from '../../components/cartcontrol/cartcontrol.vue'
   import shopcart from '../../components/shopcart/shopcart.vue'
+  import food from '../../components/food/food.vue'
   import BScroll from 'better-scroll'
   export default {
     components:{
       cartcontrol,
-      shopcart
+      shopcart,
+      food
     },
     data () {
       return {
         supportsClasses: ['decrease', 'discount', 'guarantee', 'invoice', 'special'],
         scrollY:0,
-        taps:[]
+        taps:[],
+        isShow:false,
+        food:{}
       }
     },
     mounted(){
@@ -115,6 +122,11 @@
       clickMenu(index){
         this.scrollY = this.taps[index]
         this.foodsScroll.scrollTo(0,-this.taps[index],500)
+      },
+      ShowFood(food){
+        this.food = food
+
+        this.$refs.food.toggleShow()
       }
     }
   }

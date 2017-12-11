@@ -44,6 +44,7 @@
     background-repeat no-repeat
     display inline-block
   .star_48
+    display inline-block
     .star
       width 20px
       height 20px
@@ -57,6 +58,7 @@
     .half
       bg_image(star48_half)
   .star_36
+    display inline-block
     .star
       width 15px
       height 15px
@@ -70,6 +72,7 @@
     .half
       bg_image(star36_half)
   .star_24
+    display inline-block
     .star
       width 10px
       height 10px

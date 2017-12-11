@@ -4,7 +4,8 @@ import {
   RECEIVE_RATINGS,
   RECEIVE_SELLER,
   INCREMENT_FOOD_COUNT,
-  DECREMENT_FOOD_COUNT} from './type'
+  DECREMENT_FOOD_COUNT,
+  CLEAR_FOOD_COUNT} from './type'
 
 import Vue from 'vue'
 
@@ -34,5 +35,12 @@ export default {
     if(food.count){
       food.count--
     }
+  },
+
+  [CLEAR_FOOD_COUNT](state,{cartFoods}){
+    console.log(cartFoods);
+    cartFoods.forEach(food =>{
+      food.count = 0
+    })
   }
 }

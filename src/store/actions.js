@@ -4,7 +4,8 @@ import {
   RECEIVE_RATINGS,
   RECEIVE_SELLER,
   INCREMENT_FOOD_COUNT,
-  DECREMENT_FOOD_COUNT} from './type'
+  DECREMENT_FOOD_COUNT,
+  CLEAR_FOOD_COUNT} from './type'
 
 const CODE_OK = 0
 
@@ -21,22 +22,24 @@ export default {
     })
   },
 
-  getRatings({commit}){
+  getRatings({commit},callback){
     api.reqRatings().then(response =>{
       let result = response.data
       if(result.code === CODE_OK){
         const ratings = result.data
         commit(RECEIVE_RATINGS,{ratings})
+        callback && callback()
       }
     })
   },
 
-  getSeller({commit}){
+  getSeller({commit},callback){
     api.reqSeller().then(response =>{
       let result = response.data
       if(result.code === CODE_OK){
         const seller = result.data
         commit(RECEIVE_SELLER,{seller})
+        callback && callback()
       }
     })
   },
@@ -47,5 +50,9 @@ export default {
     }else {
       commit(DECREMENT_FOOD_COUNT,{food})
     }
+  },
+
+  clear({commit},cartFoods){
+    commit(CLEAR_FOOD_COUNT,{cartFoods})
   }
 }
