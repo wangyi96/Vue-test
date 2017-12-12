@@ -166,14 +166,14 @@
 ```
 
 ## 小球动画
-1). 在页面定义6个小球的div, 并实现6个小球循环使用 (比每次创建一个新的div效率要高)
-2). 利用vue中transition的钩子(生命周期回调函数)函数去控制动画(动画的起始是动态的, 通过样式无法指定)
-3). 小球是两个嵌套的div组成(x轴与y轴的动画效果是不一样的)
-4). 组件(父子或兄弟)间通信
-    PubSubJS(消息订阅与发布/全局事件总线)
-5). 强制重排与重绘
-    https://www.cnblogs.com/zichi/p/4720000.html
-6). 需要在transition标签上加上:css='false'禁止transition的样式
+- 在页面定义6个小球的div, 并实现6个小球循环使用 (比每次创建一个新的div效率要高)
+- 利用vue中transition的钩子(生命周期回调函数)函数去控制动画(动画的起始是动态的, 通过样式无法指定)
+- 小球是两个嵌套的div组成(x轴与y轴的动画效果是不一样的)
+- 组件(父子或兄弟)间通信
+  - PubSubJS(消息订阅与发布/全局事件总线)
+- 强制重排与重绘
+  - ``https://www.cnblogs.com/zichi/p/4720000.html``
+- 需要在transition标签上加上:css='false'禁止transition的样式
 
 ## vue UI库使用: mint-ui/element-ui/iview
 - 引入mint-ui
